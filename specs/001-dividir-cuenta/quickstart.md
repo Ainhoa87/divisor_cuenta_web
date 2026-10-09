@@ -2,41 +2,38 @@
 
 ## Prerequisites
 
-- Flutter installed on its stable channel, with the Dart SDK bundled with Flutter.
-- The project checked out locally.
-- No Internet connection is required while using the calculator. It uses only the
-  Flutter SDK and its bundled `flutter_test` package.
+- Node.js compatible with the repository's Vite version.
+- npm dependencies installed from `package-lock.json`.
 
-## Setup and validation commands
+## Run locally
 
-Run these commands from the project root:
-
-```powershell
-flutter pub get
-flutter analyze
-flutter test
-flutter run
+```sh
+npm install
+npm run dev
 ```
 
-`flutter_test` is included with the Flutter SDK. `flutter analyze` should complete with
-no issues. `flutter test` covers the six acceptance scenarios, invalid inputs, and an
-offline calculation with HTTP client creation blocked.
+Open the local Vite URL. The calculator works without an Internet connection after the
+application assets have loaded because bill splitting is performed entirely in the
+browser.
 
-## Acceptance walkthrough
+## Validate with Vitest
 
-On the single screen, enter the values, select the rounding mode, and press **Calcular**.
+```sh
+npm test
+```
 
-| Scenario | Inputs | Expected result |
-|---|---|---|
-| 1 | 100.00; 4 people; 10%; Exacto | 27.50 per person |
-| 2 | 90.00; 3 people; 0%; Exacto | 30.00 per person |
-| 3 | 50.00; 0 people | `Debe haber al menos una persona`; no result |
-| 4 | Amount `abc` | `Monto inválido`; no result |
-| 5 | 10.00; 3 people; 0%; Exacto | 3.33 per person |
-| 6 | 10.00; 3 people; 0%; Hacia arriba | 4.00 per person |
+The implementation task must add the Vitest script and configure a DOM environment for
+screen interaction tests. The feature tests must cover:
 
-For the offline criterion, enable airplane mode, enter valid values, and confirm that a
-calculation still succeeds. No network call or database is part of the calculation.
+- 100.00 / 4 people / 10% / exact → 27.50.
+- 90.00 / 3 people / 0% / exact → 30.00.
+- 10.00 / 3 people / 0% / exact → 3.33.
+- 10.00 / 3 people / 0% / upward → 4.00.
+- 50.00 / 0 people → `Debe haber al menos una persona`, no result.
+- `abc` amount → `Monto inválido`, no result.
+- Negative amount or tip → rejected, no result.
+- An invalid calculation after a valid one hides the old result.
+- Calculating valid values remains possible offline.
 
-The automated offline test blocks HTTP client creation. For a manual device check,
-enable airplane mode and repeat a valid calculation.
+Use [the UI contract](contracts/ui.md) and [the data model](data-model.md) for expected
+boundaries and result behavior.

@@ -1,80 +1,42 @@
 # Data Model: Dividir cuenta
 
-All types below are planned as null-safe Dart values. Files under `domain/` use Dart
-standard libraries only and do not import Flutter.
+## Cuenta
 
-## `Cuenta`
+Represents the parsed inputs for one calculation.
 
-Validated inputs for one calculation.
+| Field | Type | Rules | Source |
+|---|---|---|---|
+| `monto` | number | Finite and greater than or equal to zero | Amount input |
+| `personas` | integer | Greater than or equal to one | People input |
+| `propinaPorcentaje` | number | Finite and greater than or equal to zero | Tip percentage input |
 
-| Field | Type | Rule |
+The selected rounding strategy is passed as a dependency to the calculation and is not
+stored in the account entity.
+
+## Resultado
+
+Represents the individual share before presentation formatting.
+
+| Field | Type | Rules |
 |---|---|---|
-| `montoTotal` | `double` | Finite and greater than or equal to zero |
-| `numeroPersonas` | `int` | At least one |
-| `porcentajePropina` | `double` | Finite and greater than or equal to zero |
+| `aporteIndividual` | number | Total with tip divided by people, then transformed by the selected rounding strategy; finite and non-negative |
 
-The account carries calculation inputs only; text parsing and validation happen before
-the calculator receives it.
+## Validation outcome
 
-## `ValidarEntrada`
+`validarEntrada` receives the raw values from form state and returns a discriminated
+outcome: valid with a `Cuenta`, or invalid with a user-facing message. Required exact
+messages are `Monto inválido` for an empty/invalid amount and `Debe haber al menos una
+persona` for a people count below one. Negative amount/tip, invalid tip, or a non-integer
+people count are rejected with a clear message. Invalid submission clears the currently
+visible result.
 
-Accepts the three raw form values and returns either a valid `Cuenta` or a typed input
-error. The validation outcome is mutually exclusive: it never contains both a `Cuenta`
-and an error, or neither. A small domain error enum distinguishes invalid amount,
-insufficient people, and invalid tip. Presentation maps these error codes to Spanish
-messages; the calculator does not validate or format.
+## Calculation
 
-Validation rules:
+For a valid account:
 
-- Amount must be present, numeric, finite, and nonnegative. The specified error text is
-  `Monto inválido`.
-- People must parse as a whole number of at least one. The specified error text for
-  zero people is `Debe haber al menos una persona`.
-- Tip must be numeric, finite, and nonnegative. Its message may be a concise Spanish
-  validation message, as permitted by the specification.
-- A failed calculation clears any previously displayed result.
+1. `totalConPropina = monto + monto * propinaPorcentaje / 100`.
+2. `aporteSinRedondear = totalConPropina / personas`.
+3. `aporteIndividual = estrategia.aplicar(aporteSinRedondear)`.
 
-## `EstrategiaRedondeo`
-
-Pure Dart interface with one method receiving a numeric per-person share and returning
-the adjusted numeric share. It is the abstraction consumed by `CalcularDivision`.
-
-## Strategy registry
-
-`DivisorController` receives an open `Map<String, EstrategiaRedondeo>` by constructor.
-`main.dart` registers the initial keys `exacto` and `hacia-arriba`; presentation receives
-the corresponding display labels and derives its options from the registry. Adding a
-strategy adds an implementation and a composition registration without changing the
-existing calculation, controller, screen, or a closed mode enum.
-
-## `CalcularDivision`
-
-Receives a valid `Cuenta` and an `EstrategiaRedondeo`. It calculates:
-
-`totalConPropina = montoTotal + montoTotal * porcentajePropina / 100`
-
-`importeBasePorPersona = totalConPropina / numeroPersonas`
-
-It passes the base share to the strategy and returns a `Resultado`. It does not parse,
-validate, choose concrete strategies, or format display text.
-
-## `Resultado`
-
-Successful numeric output of a calculation.
-
-| Field | Type | Meaning |
-|---|---|---|
-| `totalConPropina` | `double` | Full bill including tip |
-| `importePorPersona` | `double` | Share after applying the selected strategy |
-
-Presentation formats `importePorPersona` to two decimal places. In upward mode an
-integer result is still displayed with `.00`.
-
-## Rounding implementations in `data/`
-
-- `RedondeoExacto`: returns the input share unchanged; presentation shows two decimals.
-- `RedondeoHaciaArriba`: returns the next integer if the input share has a fractional
-  part; if already an integer, returns it unchanged.
-
-Neither implementation mutates the account or result, and both can substitute through
-`EstrategiaRedondeo`.
+Presentation formats the resulting number to two decimal places. The rounding strategy
+is applied to the share, not to the full bill.

@@ -1,50 +1,62 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+Version change: unversioned template → 1.0.0
+Modified principles: template placeholders → SOLID (SRP, OCP, LSP, ISP, DIP)
+Added sections: Architecture, Security, Quality and Testing, Rule of the Subject
+Removed sections: none
+Follow-up TODOs: original ratification date is unknown
+-->
+# Constitución del proyecto Divisor de Cuenta
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Single Responsibility Principle (SRP)
+Cada función o módulo tiene una sola razón de cambio. El cálculo no valida datos ni
+formatea resultados; esas responsabilidades se mantienen separadas.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Open/Closed Principle (OCP)
+Agregar una regla de redondeo no obliga a editar los módulos existentes.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Liskov Substitution Principle (LSP)
+Cualquier implementación de la interfaz de redondeo puede sustituir a otra sin que
+quien la usa tenga que preguntar de qué tipo es.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Interface Segregation Principle (ISP)
+Las interfaces son pequeñas; ningún consumidor depende de funciones que no usa.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Dependency Inversion Principle (DIP)
+Presentation depende de abstracciones de domain y nunca de implementaciones concretas
+de data.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Arquitectura
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- Las capas son `src/presentation`, `src/domain` y `src/data`.
+- La regla de dependencia es `presentation → domain ← data`.
+- `src/domain/` no importa React ni APIs del DOM; contiene JavaScript puro.
+- `src/main.jsx` es el único lugar donde se instancian implementaciones concretas.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Seguridad
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+Nunca se guardan secretos ni API keys en el repositorio.
+
+## Calidad y pruebas
+
+- Toda funcionalidad crítica tiene pruebas.
+- Los criterios de aceptación de la spec se convierten en pruebas ejecutables.
+
+## Regla de la materia
+
+Toda función generada por el agente debe poder explicarla el estudiante: qué hace,
+por qué existe, qué recibe, qué devuelve y qué errores produce.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+Las enmiendas a esta constitución se reflejan en este archivo. Al cambiarla, se
+actualizan la versión y la fecha de última enmienda: cambios incompatibles a los
+principios incrementan MAJOR; principios o secciones nuevos, o guía materialmente
+ampliada, incrementan MINOR; aclaraciones sin cambio de significado incrementan
+PATCH. Las revisiones del trabajo comprueban el cumplimiento de los principios,
+las reglas de arquitectura, seguridad, pruebas y la regla de la materia aquí
+establecidos.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): fecha original desconocida | **Last Amended**: 2026-10-09

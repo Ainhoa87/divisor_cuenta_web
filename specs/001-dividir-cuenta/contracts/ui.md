@@ -1,30 +1,33 @@
 # UI Contract: Dividir cuenta
 
-This application exposes no network API or database contract. Its public interaction is
-the single-screen form below.
+## Screen
 
-## Inputs
+`PantallaDivisor` is the sole screen. It renders the amount, people count and tip inputs,
+a choice between the exact and upward rounding strategies, a `Calcular` action, and the
+current validation message or calculation result.
 
-- **Monto total**: numeric, nonnegative amount.
-- **Personas**: whole-number count; must be at least one.
-- **Propina**: numeric, nonnegative percentage.
-- **Redondeo**: one of `Exacto` or `Hacia arriba`.
+## User-visible behavior
 
-## Action
+- Editing fields does not calculate automatically; calculation occurs on `Calcular`.
+- A valid submission displays one individual contribution with two decimal places.
+- Exact rounding leaves the individual share unchanged before formatting.
+- Upward rounding raises a fractional individual share to the next integer; an already
+  whole value remains unchanged.
+- An invalid submission displays its validation message and hides any result from the
+  preceding successful submission.
+- The screen and calculation require no network or database.
 
-The user selects **Calcular** to validate the current fields and calculate. Editing a
-field alone does not calculate. A successful action shows the amount per person with two
-decimal places. In `Hacia arriba` mode, each share is rounded up to the next whole unit
-before display.
+## Composition and dependency contract
 
-## Outcomes
+`src/main.jsx` instantiates `redondeoExacto` and `redondeoHaciaArriba`, along with any
+other concrete domain services, and provides them to presentation. `useDivisor` receives
+its dependencies; it does not import or instantiate concrete data implementations.
+`estrategiaRedondeo` defines `aplicar(valor)`; any implementation satisfying that
+contract can be supplied without type checks.
 
-| Condition | Visible outcome |
-|---|---|
-| Valid amount, people, and tip | Result for each person, formatted to two decimals |
-| Zero people | `Debe haber al menos una persona`; no result |
-| Empty or invalid amount | `Monto inválido`; no result |
-| Other invalid numeric input | Concise Spanish validation message; no result |
-| Invalid attempt after a successful calculation | Error message; previous result is cleared |
+## Accessibility and formatting
 
-The screen requires no Internet connection and has no persistence across app closure.
+Each input has a visible, programmatically associated label. Validation feedback is
+associated with the form and exposed as an alert/status message. `formateadorMoneda`
+formats the numeric domain result to two decimals; currency/locale must be configured
+there without changing domain values.
