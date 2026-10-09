@@ -21,6 +21,16 @@
 - **Alternatives considered**: A mode conditional inside `calcularDivision` would make
   adding strategies require editing an existing module.
 
+### Strategy registration
+
+- **Decision**: `src/main.jsx` constructs each concrete strategy and passes the labeled
+  strategy list to presentation. The screen renders that list without naming concrete
+  strategies.
+- **Rationale**: Registering another strategy then changes the composition root and
+  adds its implementation without editing the calculation or screen.
+- **Alternatives considered**: Hard-coded strategy branches in the hook or screen would
+  make those modules change whenever a rounding rule is added.
+
 ### Validation result
 
 - **Decision**: `validarEntrada` returns either a valid `cuenta` or a validation error.
@@ -46,6 +56,6 @@
   assumptions in the spec.
 - The monetary value remains numeric in domain; two-decimal presentation belongs to
   `formateadorMoneda` and must not affect calculation precision.
-- The spec does not name a currency. The implementation should keep that choice inside
-  the presentation formatter; the task phase should use the project locale/currency
-  explicitly if confirmed by the user or existing product context.
+- The spec does not name a currency or locale and its examples specify only two-decimal
+  values. The presentation formatter therefore displays exactly two decimal digits and
+  no currency symbol until product requirements specify one.
