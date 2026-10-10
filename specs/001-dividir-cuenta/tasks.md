@@ -122,3 +122,7 @@ Task: T006 accepted calculation screen tests in src/presentation/__tests__/Panta
 ### Incremental Delivery
 
 Deliver the valid calculation flow first as US1, then add US2 error handling and stale-result clearing. Both increments use the same screen and injected dependencies.
+
+## Phase 6: Convergence
+
+- [ ] T027 Reconcile the T001 and T026 completion markers and notes with the verified dependency installation, test run, and production build (plan: task-status accuracy) (partial)
