@@ -10,10 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: divisor_cuenta_web
-
     steps:
       - uses: actions/checkout@v4
 
